@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/goadapp/goad/api"
+	"github.com/rickbassham/goad/api"
 	uuid "github.com/satori/go.uuid"
 )
 

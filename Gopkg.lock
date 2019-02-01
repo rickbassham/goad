@@ -21,7 +21,10 @@
 [[projects]]
   branch = "master"
   name = "github.com/alecthomas/template"
-  packages = [".","parse"]
+  packages = [
+    ".",
+    "parse"
+  ]
   revision = "a0175ee3bccc567396460bf5acd36800cb10c49c"
 
 [[projects]]
@@ -32,9 +35,46 @@
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
-  packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/json/jsonutil","private/protocol/jsonrpc","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/restjson","private/protocol/xml/xmlutil","service/iam","service/lambda","service/lambda/lambdaiface","service/sqs","service/sts"]
+  packages = [
+    "aws",
+    "aws/awserr",
+    "aws/awsutil",
+    "aws/client",
+    "aws/client/metadata",
+    "aws/corehandlers",
+    "aws/credentials",
+    "aws/credentials/ec2rolecreds",
+    "aws/credentials/endpointcreds",
+    "aws/credentials/stscreds",
+    "aws/defaults",
+    "aws/ec2metadata",
+    "aws/endpoints",
+    "aws/request",
+    "aws/session",
+    "aws/signer/v4",
+    "internal/shareddefaults",
+    "private/protocol",
+    "private/protocol/json/jsonutil",
+    "private/protocol/jsonrpc",
+    "private/protocol/query",
+    "private/protocol/query/queryutil",
+    "private/protocol/rest",
+    "private/protocol/restjson",
+    "private/protocol/xml/xmlutil",
+    "service/iam",
+    "service/lambda",
+    "service/lambda/lambdaiface",
+    "service/sqs",
+    "service/sts"
+  ]
   revision = "77c204059e353965728c1898f9755d4970294da0"
   version = "v1.10.25"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/codahale/hdrhistogram"
+  packages = ["."]
+  revision = "3a0bb77429bd3a61596f5e8a3172445844342120"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -43,17 +83,51 @@
 
 [[projects]]
   name = "github.com/docker/distribution"
-  packages = [".","context","digestset","manifest","manifest/manifestlist","reference","uuid"]
+  packages = [
+    ".",
+    "context",
+    "digestset",
+    "manifest",
+    "manifest/manifestlist",
+    "reference",
+    "uuid"
+  ]
   revision = "1e2f10eb65743fed02f573d31a4587de09afb20e"
 
 [[projects]]
   name = "github.com/docker/docker"
-  packages = ["api","api/types","api/types/blkiodev","api/types/container","api/types/events","api/types/filters","api/types/image","api/types/mount","api/types/network","api/types/registry","api/types/strslice","api/types/swarm","api/types/time","api/types/versions","api/types/volume","client","pkg/ioutils","pkg/longpath","pkg/mount","pkg/system","pkg/tlsconfig"]
+  packages = [
+    "api",
+    "api/types",
+    "api/types/blkiodev",
+    "api/types/container",
+    "api/types/events",
+    "api/types/filters",
+    "api/types/image",
+    "api/types/mount",
+    "api/types/network",
+    "api/types/registry",
+    "api/types/strslice",
+    "api/types/swarm",
+    "api/types/time",
+    "api/types/versions",
+    "api/types/volume",
+    "client",
+    "pkg/ioutils",
+    "pkg/longpath",
+    "pkg/mount",
+    "pkg/system",
+    "pkg/tlsconfig"
+  ]
   revision = "c307f4521edc58df347897c84159f25606cae597"
 
 [[projects]]
   name = "github.com/docker/go-connections"
-  packages = ["nat","sockets","tlsconfig"]
+  packages = [
+    "nat",
+    "sockets",
+    "tlsconfig"
+  ]
   revision = "e15c02316c12de00874640cd76311849de2aeed5"
 
 [[projects]]
@@ -138,7 +212,10 @@
 [[projects]]
   branch = "master"
   name = "github.com/spf13/afero"
-  packages = [".","mem"]
+  packages = [
+    ".",
+    "mem"
+  ]
   revision = "9be650865eab0c12963d8753212f4f9c66cdcf12"
 
 [[projects]]
@@ -160,18 +237,32 @@
 
 [[projects]]
   name = "golang.org/x/net"
-  packages = ["context","context/ctxhttp","proxy"]
+  packages = [
+    "context",
+    "context/ctxhttp",
+    "proxy"
+  ]
   revision = "da118f7b8e5954f39d0d2130ab35d4bf0e3cb344"
 
 [[projects]]
   name = "golang.org/x/sys"
-  packages = ["unix","windows"]
+  packages = [
+    "unix",
+    "windows"
+  ]
   revision = "b90f89a1e7a9c1f6b918820b3daa7f08488c8594"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/text"
-  packages = ["internal/gen","internal/triegen","internal/ucd","transform","unicode/cldr","unicode/norm"]
+  packages = [
+    "internal/gen",
+    "internal/triegen",
+    "internal/ucd",
+    "transform",
+    "unicode/cldr",
+    "unicode/norm"
+  ]
   revision = "cfdf022e86b4ecfb646e1efbd7db175dd623a8fa"
 
 [[projects]]
@@ -195,6 +286,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b4a7c82ef87e35e38f64abecf1640fa6fb5934a7e91714af11cf954dbff0e631"
+  inputs-digest = "74c99d7d9ffac1b8e00b05343d19babf621706feee517431d2e276228373a934"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -1,11 +1,11 @@
 package goad
 
 import (
-	"github.com/goadapp/goad/goad/types"
-	"github.com/goadapp/goad/infrastructure"
-	"github.com/goadapp/goad/infrastructure/aws"
-	"github.com/goadapp/goad/infrastructure/docker"
-	"github.com/goadapp/goad/result"
+	"github.com/rickbassham/goad/goad/types"
+	"github.com/rickbassham/goad/infrastructure"
+	"github.com/rickbassham/goad/infrastructure/aws"
+	"github.com/rickbassham/goad/infrastructure/docker"
+	"github.com/rickbassham/goad/result"
 )
 
 // Start a test
