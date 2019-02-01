@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/goadapp/goad/goad/types"
-	"github.com/goadapp/goad/result"
+	"github.com/rickbassham/goad/goad/types"
+	"github.com/rickbassham/goad/result"
 )
 
 const DefaultRunnerAsset = "data/lambda.zip"

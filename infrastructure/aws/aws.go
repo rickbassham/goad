@@ -10,8 +10,8 @@ import (
 	"path"
 	"time"
 
-	"github.com/goadapp/goad/goad/types"
-	"github.com/goadapp/goad/infrastructure/aws/sqsadapter"
+	"github.com/rickbassham/goad/goad/types"
+	"github.com/rickbassham/goad/infrastructure/aws/sqsadapter"
 
 	"github.com/Songmu/prompter"
 	"github.com/aws/aws-sdk-go/aws"
@@ -20,9 +20,9 @@ import (
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/goadapp/goad/infrastructure"
-	"github.com/goadapp/goad/result"
-	"github.com/goadapp/goad/version"
+	"github.com/rickbassham/goad/infrastructure"
+	"github.com/rickbassham/goad/result"
+	"github.com/rickbassham/goad/version"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -184,7 +184,7 @@ func (infra *AwsInfrastructure) createLambdaFunction(svc *lambda.Lambda, roleArn
 		FunctionName: aws.String("goad"),
 		Handler:      aws.String("index.handler"),
 		Role:         aws.String(roleArn),
-		Runtime:      aws.String("nodejs4.3"),
+		Runtime:      aws.String("nodejs6.10"),
 		MemorySize:   aws.Int64(1536),
 		Publish:      aws.Bool(true),
 		Timeout:      aws.Int64(300),

@@ -3,10 +3,12 @@ package result
 import (
 	"math"
 	"sort"
+	"sync"
 	"time"
 
-	"github.com/goadapp/goad/api"
-	"github.com/goadapp/goad/goad/util"
+	"github.com/codahale/hdrhistogram"
+	"github.com/rickbassham/goad/api"
+	"github.com/rickbassham/goad/goad/util"
 )
 
 // AggData type
@@ -26,6 +28,7 @@ type AggData struct {
 	Region               string
 	FatalError           string
 	Finished             bool
+	Histogram            *hdrhistogram.Histogram
 }
 
 // LambdaResults type
@@ -81,11 +84,16 @@ func SetupRegionsAggData(lambdaCount int) *LambdaResults {
 	return lambdaResults
 }
 
+var _lock sync.Mutex
+
 func sumAggData(dataArray []AggData) AggData {
+	_lock.Lock()
+	defer _lock.Unlock()
 	sum := AggData{
-		Fastest:  math.MaxInt64,
-		Statuses: make(map[string]int),
-		Finished: true,
+		Fastest:   math.MaxInt64,
+		Statuses:  make(map[string]int),
+		Finished:  true,
+		Histogram: hdrhistogram.New(0, 100, 2),
 	}
 	for _, lambda := range dataArray {
 		sum.AveKBytesPerSec += lambda.AveKBytesPerSec
@@ -111,6 +119,8 @@ func sumAggData(dataArray []AggData) AggData {
 		sum.TotalReqs += lambda.TotalReqs
 		sum.TotalTimedOut += lambda.TotalTimedOut
 		sum.TotBytesRead += lambda.TotBytesRead
+
+		sum.Histogram.Merge(lambda.Histogram)
 	}
 	sum.AveTimeForReq = sum.AveTimeForReq / int64(len(dataArray))
 	sum.AveTimeToFirst = sum.AveTimeToFirst / int64(len(dataArray))
@@ -130,6 +140,14 @@ func AddResult(data *AggData, result *api.RunnerResult) {
 	initCountOk := int64(data.TotalReqs - data.TotalTimedOut - data.TotalConnectionError)
 	addCountOk := int64(result.RequestCount - result.TimedOut - result.ConnectionErrors)
 	totalCountOk := initCountOk + addCountOk
+
+	hist := hdrhistogram.Import(result.Histogram)
+
+	if data.Histogram == nil {
+		data.Histogram = hist
+	} else {
+		data.Histogram.Merge(hist)
+	}
 
 	data.TotalReqs += result.RequestCount
 	data.TotalTimedOut += result.TimedOut

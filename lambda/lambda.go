@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math"
+	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
@@ -23,9 +24,10 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
-	"github.com/goadapp/goad/api"
-	"github.com/goadapp/goad/infrastructure/aws/sqsadapter"
-	"github.com/goadapp/goad/version"
+	"github.com/codahale/hdrhistogram"
+	"github.com/rickbassham/goad/api"
+	"github.com/rickbassham/goad/infrastructure/aws/sqsadapter"
+	"github.com/rickbassham/goad/version"
 	"github.com/streadway/amqp"
 )
 
@@ -52,8 +54,11 @@ var (
 )
 
 const AWS_MAX_TIMEOUT = 295
+const MAX_RAND = 50000000
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
+
 	lambdaSettings := parseLambdaSettings()
 	Lambda := newLambda(lambdaSettings)
 	Lambda.runLoadTest()
@@ -429,7 +434,7 @@ func fetch(client *http.Client, p requestParameters, loadTestStartTime time.Time
 }
 
 func prepareHttpRequest(params requestParameters) *http.Request {
-	req, err := http.NewRequest(params.RequestMethod, params.URL, bytes.NewBufferString(params.RequestBody))
+	req, err := http.NewRequest(params.RequestMethod, fmt.Sprintf("%s%d", params.URL, rand.Intn(MAX_RAND)), bytes.NewBufferString(params.RequestBody))
 	if err != nil {
 		fmt.Println("Error creating the HTTP request:", err)
 		panic("")
@@ -457,6 +462,7 @@ type requestMetric struct {
 	timeToFirstTotal          int64
 	requestTimeTotal          int64
 	requestCountSinceLastSend int64
+	histogram                 *hdrhistogram.Histogram
 }
 
 type resultSender interface {
@@ -482,6 +488,8 @@ func (m *requestMetric) addRequest(r *requestResult) {
 		m.firstRequestTime = r.Time
 	}
 	m.lastRequestTime = r.Time + r.Elapsed
+
+	m.histogram.RecordValue(r.Elapsed / int64(time.Millisecond))
 
 	if r.Timeout {
 		agg.TimedOut++
@@ -521,12 +529,14 @@ func (m *requestMetric) aggregate() {
 }
 
 func (m *requestMetric) sendAggregatedResults(sender resultSender) {
+	m.aggregatedResults.Histogram = m.histogram.Export()
 	err := sender.SendResult(*m.aggregatedResults)
 	failOnError(err, "Failed to send data to cli")
 	m.resetAndKeepTotalReqs()
 }
 
 func (m *requestMetric) resetAndKeepTotalReqs() {
+	m.histogram = hdrhistogram.New(0, 100, 2)
 	m.requestCountSinceLastSend = 0
 	m.firstRequestTime = 0
 	m.lastRequestTime = 0

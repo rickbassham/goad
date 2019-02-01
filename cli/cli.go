@@ -19,10 +19,10 @@ import (
 	ini "gopkg.in/ini.v1"
 
 	"github.com/dustin/go-humanize"
-	"github.com/goadapp/goad/goad"
-	"github.com/goadapp/goad/goad/types"
-	"github.com/goadapp/goad/result"
-	"github.com/goadapp/goad/version"
+	"github.com/rickbassham/goad/goad"
+	"github.com/rickbassham/goad/goad/types"
+	"github.com/rickbassham/goad/result"
+	"github.com/rickbassham/goad/version"
 	"github.com/nsf/termbox-go"
 )
 
@@ -88,6 +88,7 @@ func Run() {
 
 	result := start(config, sigChan)
 	defer printSummary(result)
+	defer saveCSV(result)
 	if config.Output != "" {
 		defer saveJSONSummary(*outputFile, result)
 	}
@@ -484,6 +485,22 @@ func printSummary(results result.LambdaResults) {
 		fmt.Printf("%10s %10d\n", statusStr, value)
 	}
 	fmt.Println("")
+
+	fmt.Println("Histogram")
+	fmt.Printf("  50%%  %5dms\n", overall.Histogram.ValueAtQuantile(50))
+	fmt.Printf("  75%%  %5dms\n", overall.Histogram.ValueAtQuantile(75))
+	fmt.Printf("  90%%  %5dms\n", overall.Histogram.ValueAtQuantile(90))
+	fmt.Printf("  95%%  %5dms\n", overall.Histogram.ValueAtQuantile(95))
+	fmt.Printf("  96%%  %5dms\n", overall.Histogram.ValueAtQuantile(96))
+	fmt.Printf("  97%%  %5dms\n", overall.Histogram.ValueAtQuantile(97))
+	fmt.Printf("  98%%  %5dms\n", overall.Histogram.ValueAtQuantile(98))
+	fmt.Printf("  99%%  %5dms\n", overall.Histogram.ValueAtQuantile(99))
+	fmt.Println("")
+
+	fmt.Printf("  Min:    %5dms\n", overall.Histogram.Min())
+	fmt.Printf("  Max:    %5dms\n", overall.Histogram.Max())
+	fmt.Printf("  Mean:   %5.1fms\n", overall.Histogram.Mean())
+	fmt.Printf("  StdDev: %5.1fms\n", overall.Histogram.StdDev())
 }
 
 func saveJSONSummary(path string, results result.LambdaResults) {
@@ -505,4 +522,33 @@ func saveJSONSummary(path string, results result.LambdaResults) {
 		fmt.Println(err)
 		return
 	}
+}
+
+func saveCSV(results result.LambdaResults) {
+	overall := results.SumAllLambdas()
+
+	runTime := time.Now().Unix()
+
+	f, _ := os.Create(fmt.Sprintf("%d_histogram.csv", runTime))
+
+	fmt.Fprintln(f, "from,to,count")
+	for _, bar := range overall.Histogram.Distribution() {
+		fmt.Fprint(f, bar.String())
+	}
+
+	f.Close()
+
+	f, _ = os.Create(fmt.Sprintf("%d_summary.csv", runTime))
+	fmt.Fprintln(f, "totalRequests,totalTimedOut,min,max,mean,stdDev,concurrency,requestPerSec")
+	fmt.Fprintf(f, "%d,%d,%d,%d,%f,%f,%d,%f\n",
+		overall.TotalReqs,
+		overall.TotalTimedOut,
+		overall.Histogram.Min(),
+		overall.Histogram.Max(),
+		overall.Histogram.Mean(),
+		overall.Histogram.StdDev(),
+		*concurrency,
+		overall.AveReqPerSec)
+
+	f.Close()
 }
