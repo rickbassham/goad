@@ -145,9 +145,7 @@ func (infra *AwsInfrastructure) Setup() (func(), error) {
 		return nil, err
 	}
 	infra.queueURL = queueURL
-	return func() {
-
-	}, nil
+	return infra.teardown, nil
 }
 
 func calcShasum(payload []byte) string {
