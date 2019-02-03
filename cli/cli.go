@@ -19,11 +19,11 @@ import (
 	ini "gopkg.in/ini.v1"
 
 	"github.com/dustin/go-humanize"
+	"github.com/nsf/termbox-go"
 	"github.com/rickbassham/goad/goad"
 	"github.com/rickbassham/goad/goad/types"
 	"github.com/rickbassham/goad/result"
 	"github.com/rickbassham/goad/version"
-	"github.com/nsf/termbox-go"
 )
 
 const (
@@ -529,7 +529,9 @@ func saveCSV(results result.LambdaResults) {
 
 	runTime := time.Now().Unix()
 
-	f, _ := os.Create(fmt.Sprintf("%d_histogram.csv", runTime))
+	var f io.WriteCloser
+
+	f, _ = os.Create(fmt.Sprintf("%d_histogram.csv", runTime))
 
 	fmt.Fprintln(f, "from,to,count")
 	for _, bar := range overall.Histogram.Distribution() {
@@ -538,9 +540,16 @@ func saveCSV(results result.LambdaResults) {
 
 	f.Close()
 
-	f, _ = os.Create(fmt.Sprintf("%d_summary.csv", runTime))
-	fmt.Fprintln(f, "totalRequests,totalTimedOut,min,max,mean,stdDev,concurrency,requestPerSec")
-	fmt.Fprintf(f, "%d,%d,%d,%d,%f,%f,%d,%f\n",
+	var err error
+
+	f, err = os.OpenFile("summary.csv", os.O_RDWR|os.O_APPEND, 0666)
+	if os.IsNotExist(err) {
+		f, _ = os.Create("summary.csv")
+		fmt.Fprintln(f, "endTime,totalRequests,totalTimedOut,min,max,mean,stdDev,concurrency,requestPerSec")
+	}
+
+	fmt.Fprintf(f, "%d,%d,%d,%d,%d,%f,%f,%d,%f\n",
+		time.Now().Unix(),
 		overall.TotalReqs,
 		overall.TotalTimedOut,
 		overall.Histogram.Min(),
